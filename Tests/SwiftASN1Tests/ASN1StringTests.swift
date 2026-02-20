@@ -71,6 +71,22 @@ final class ASN1StringTests: XCTestCase {
         string.withUnsafeBytes { XCTAssertTrue($0.elementsEqual([0x54, 0x65, 0x73, 0x74])) }
     }
 
+    func testVisibleStringEncoding() throws {
+        var serializer = DER.Serializer()
+        let originalString = try ASN1VisibleString(contentBytes: [0x20, 0x30, 0x7a, 0x7e])
+        try serializer.serialize(originalString)
+        XCTAssertEqual(serializer.serializedBytes, [26, 4, 0x20, 0x30, 0x7a, 0x7e])
+    }
+
+    func testVisibleStringRoundTrips() throws {
+        try self.assertRoundTrips(ASN1VisibleString(contentBytes: [0x20, 0x30, 0x7a, 0x7e]))
+    }
+
+    func testVisibleStringContiguousBytes() throws {
+        let string = try ASN1VisibleString(contentBytes: [0x20, 0x30, 0x7a, 0x7e])
+        string.withUnsafeBytes { XCTAssertTrue($0.elementsEqual([0x20, 0x30, 0x7a, 0x7e])) }
+    }
+
     func testUniversalStringEncoding() throws {
         var serializer = DER.Serializer()
         let originalString = ASN1UniversalString(contentBytes: [1, 2, 3, 4])
